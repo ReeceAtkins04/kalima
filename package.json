@@ -1,0 +1,31 @@
+{
+  "name": "kalima",
+  "version": "0.1.0",
+  "description": "Kalima — Arabic vocabulary flashcards",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "smoke": "node scripts/smoke.mjs",
+    "shots": "node scripts/screenshots.mjs",
+    "icons": "node scripts/icon.mjs && tauri icon src-tauri/icons/source.png",
+    "tauri": "tauri"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@fontsource/amiri": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "@lucide/svelte": "^1.70.0",
+    "@tauri-apps/api": "^2"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@tauri-apps/cli": "^2",
+    "svelte": "^5.56.3",
+    "svelte-check": "^4.6.0",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.16"
+  }
+}

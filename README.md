@@ -34,6 +34,30 @@ summary, then install it over USB:
 adb install -r app-universal-release.apk
 ```
 
+### Local release APK
+
+The signed local build lives in `dist-android/`:
+
+- `kalima-universal.apk` — arm64-v8a + armeabi-v7a
+- `kalima-arm64.apk` — smaller arm64-v8a-only build
+
+Install one over USB with `adb install -r dist-android/kalima-universal.apk`.
+
+On Windows without Developer Mode, Tauri cannot create the `jniLibs` symbolic
+link. The Rust library is already compiled when that step fails, so copy it into
+the generated Android project and let Gradle finish the APK:
+
+```powershell
+npx tauri android build --apk --target aarch64 --ci   # may stop at the symlink
+Copy-Item src-tauri\target\aarch64-linux-android\release\libkalima_lib.so `
+  src-tauri\gen\android\app\src\main\jniLibs\arm64-v8a\ -Force
+Set-Location src-tauri\gen\android
+.\gradlew.bat assembleArm64Release -x rustBuildArm64Release -x rustBuildUniversalRelease
+```
+
+On Linux, macOS, GitHub Actions, or Windows with Developer Mode enabled, the
+normal command is simply `npx tauri android build --apk --ci`.
+
 The workflow needs three repository secrets:
 
 | Secret | Value |

@@ -41,12 +41,12 @@ jobs:
       - name: Install Android SDK packages
         run: |
           yes | sdkmanager --licenses > /dev/null
-          sdkmanager "platforms;android-37" "ndk;29.0.13846066"
+          sdkmanager "platforms;android-37.0" "build-tools;37.0.0" "ndk;29.0.13846066" "platform-tools"
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+          targets: aarch64-linux-android,armv7-linux-androideabi
 
       - name: Cache Rust build
         uses: swatinem/rust-cache@v2
@@ -80,7 +80,7 @@ jobs:
       - name: Build APK
         run: |
           export NDK_HOME="$ANDROID_HOME/ndk/29.0.13846066"
-          npx tauri android build --apk --ci
+          npx tauri android build --apk --ci --target aarch64 armv7
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

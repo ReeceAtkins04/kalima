@@ -10,7 +10,6 @@
   import {
     buildSession,
     computeHomeStats,
-    exportCsv,
     getActiveDeck,
     gradeCard,
     loadLibrary,
@@ -19,8 +18,14 @@
     saveLibrary,
   } from "./lib/api";
   import { createSeedLibrary } from "./lib/seed";
-  import { initNativeStorage, isTauri, setNativeTheme } from "./lib/native";
+  import {
+    applyNativeInsets,
+    initNativeStorage,
+    isTauri,
+    setNativeTheme,
+  } from "./lib/native";
   import { registerBackHandler } from "./lib/back";
+  import { exportDeckFile } from "./lib/export";
   import type {
     Grade,
     Library,
@@ -94,6 +99,11 @@
     };
     media.addEventListener("change", onChange);
 
+    // Android draws the WebView under the status and navigation bars.
+    applyNativeInsets();
+    const onResize = () => applyNativeInsets();
+    window.addEventListener("resize", onResize);
+
     const params = new URLSearchParams(window.location.search);
 
     const unregisterBack = registerBackHandler(() => {
@@ -137,6 +147,7 @@
       }
 
       if (disposed) return;
+      applyNativeInsets();
       applyDemoRoute(params);
     }
 
@@ -145,6 +156,7 @@
     return () => {
       disposed = true;
       unregisterBack();
+      window.removeEventListener("resize", onResize);
       media.removeEventListener("change", onChange);
     };
   });
@@ -279,22 +291,17 @@
   }
 
   function downloadDeck() {
-    const csv = exportCsv(library, library.activeDeckId);
-    if (!csv) {
+    const outcome = exportDeckFile(library, library.activeDeckId, deck.name);
+    if (!outcome) {
       notify("There is nothing to export yet", "error");
       return;
     }
 
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${deck.name.replaceAll(/[^\w]+/g, "-").toLowerCase() || "kalima"}.csv`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    notify("Deck exported as CSV");
+    notify(
+      outcome === "shared"
+        ? "Deck ready to save or share"
+        : "Deck exported as CSV",
+    );
   }
 
   function resetDeckProgress() {

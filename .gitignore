@@ -5,6 +5,7 @@ node_modules
 /.svelte-kit
 /package
 /shots
+/dist-android
 .env
 .env.*
 !.env.example

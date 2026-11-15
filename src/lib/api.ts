@@ -34,6 +34,9 @@ export function saveLibrary(lib: Library): void {
   try {
     const json = JSON.stringify(lib);
     localStorage.setItem(STORAGE_KEY, json);
+    // Mirrored outside the library so the inline boot script can paint the
+    // right background before Svelte mounts.
+    localStorage.setItem("kalima.theme", lib.settings.theme);
     persistNativeLibrary(json);
   } catch (error) {
     console.warn("Could not persist library", error);
@@ -374,7 +377,8 @@ export function previewIntervals(card: Card): Record<Grade, string> {
   };
 }
 
-export function resetProgress(lib: Library, deckId?: string): void {  for (const deck of lib.decks) {
+export function resetProgress(lib: Library, deckId?: string): void {
+  for (const deck of lib.decks) {
     if (deckId && deck.id !== deckId) continue;
     for (const card of deck.cards) {
       card.due = today();

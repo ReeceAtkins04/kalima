@@ -74,6 +74,19 @@ if ((await page.getByText("nature", { exact: true }).count()) === 0) {
 }
 console.log("CSV import flow passed");
 
+// Export the active deck through the browser fallback (Android uses the
+// native share sheet).
+await page.locator(".deck-switch").click();
+const downloadPromise = page.waitForEvent("download");
+await page.getByRole("button", { name: "Export", exact: true }).click();
+const download = await downloadPromise;
+if (!download.suggestedFilename().endsWith(".csv")) {
+  throw new Error(`Unexpected export filename: ${download.suggestedFilename()}`);
+}
+await page.getByText("Deck exported as CSV").waitFor();
+await page.getByRole("dialog").waitFor({ state: "detached" });
+console.log("CSV export flow passed");
+
 // Settings: dark theme, transliteration toggle, then reload persistence.
 await page.getByRole("button", { name: "Settings", exact: true }).click();
 await page.getByRole("radio", { name: /Dark/i }).click();

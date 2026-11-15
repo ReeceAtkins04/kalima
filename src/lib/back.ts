@@ -28,6 +28,8 @@ declare global {
     kalimaBack?: () => boolean;
     KalimaNative?: {
       setTheme?: (dark: boolean) => void;
+      shareCsv?: (filename: string, contents: string) => void;
+      getInsets?: () => string;
     };
   }
 }

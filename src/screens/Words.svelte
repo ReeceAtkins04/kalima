@@ -19,11 +19,11 @@
   import {
     createDeck,
     deleteCard,
-    exportCsv,
     importCsv,
     saveCard,
     saveLibrary,
   } from "../lib/api";
+  import { exportDeckFile } from "../lib/export";
   import { daysBetween, today } from "../lib/date";
   import type { Card, Deck, Library } from "../lib/types";
 
@@ -237,19 +237,15 @@
   }
 
   function exportDeck() {
-    const csv = exportCsv(library, deck.id);
-    if (!csv) return;
+    const outcome = exportDeckFile(library, deck.id, deck.name);
+    if (!outcome) return;
 
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${deck.name.replaceAll(/[^\w]+/g, "-").toLowerCase() || "kalima-deck"}.csv`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    showToast("Deck exported as CSV");
+    pickerOpen = false;
+    showToast(
+      outcome === "shared"
+        ? "Deck ready to save or share"
+        : "Deck exported as CSV",
+    );
   }
 </script>
 

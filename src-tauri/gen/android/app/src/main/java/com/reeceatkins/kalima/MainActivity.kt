@@ -55,17 +55,24 @@ class MainActivity : TauriActivity() {
 
     // Android WebView does not expose system bars through CSS env(), so the
     // insets are measured here and read by the frontend on boot and resize.
+    // The IME needs to shrink the WebView itself: with edge-to-edge enforced,
+    // adjustResize no longer makes room for the keyboard on Android 15+.
     val root = findViewById<View>(android.R.id.content)
-    ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+    ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
       val bars = insets.getInsets(
         WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
       )
+      val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
       val density = resources.displayMetrics.density
       insetTop = (bars.top / density).roundToInt()
       insetBottom = (bars.bottom / density).roundToInt()
       insetLeft = (bars.left / density).roundToInt()
       insetRight = (bars.right / density).roundToInt()
-      insets
+
+      // The navigation bar is already part of the CSS bottom safe area when
+      // the keyboard is closed; only the extra keyboard height is needed.
+      view.setPadding(0, 0, 0, maxOf(0, ime.bottom - bars.bottom))
+      WindowInsetsCompat.CONSUMED
     }
     ViewCompat.requestApplyInsets(root)
   }

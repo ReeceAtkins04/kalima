@@ -48,7 +48,7 @@ link. The Rust library is already compiled when that step fails, so copy it into
 the generated Android project and let Gradle finish the APK:
 
 ```powershell
-npx tauri android build --apk --target aarch64 --ci   # may stop at the symlink
+npx tauri android build --apk --target aarch64 --ci --features custom-protocol   # may stop at the symlink
 Copy-Item src-tauri\target\aarch64-linux-android\release\libkalima_lib.so `
   src-tauri\gen\android\app\src\main\jniLibs\arm64-v8a\ -Force
 Set-Location src-tauri\gen\android
@@ -57,6 +57,11 @@ Set-Location src-tauri\gen\android
 
 On Linux, macOS, GitHub Actions, or Windows with Developer Mode enabled, the
 normal command is simply `npx tauri android build --apk --ci`.
+
+Always build with the `custom-protocol` feature. Without it Tauri compiles in
+dev mode and the app opens an error page pointing at `http://localhost:1420`
+instead of loading the embedded UI. The Tauri CLI enables it for release builds;
+a manual `cargo build` must pass `--features custom-protocol`.
 
 The workflow needs three repository secrets:
 

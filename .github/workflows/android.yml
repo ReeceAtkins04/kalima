@@ -80,7 +80,7 @@ jobs:
       - name: Build APK
         run: |
           export NDK_HOME="$ANDROID_HOME/ndk/29.0.13846066"
-          npx tauri android build --apk --ci --target aarch64 armv7
+          npx tauri android build --apk --ci --target aarch64 armv7 --features custom-protocol
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
